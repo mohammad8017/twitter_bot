@@ -17,8 +17,9 @@ api = tweepy.API(auth)
 
 
 
-def get_tweets_by_user_name(username):
-    limit=3000
+def get_tweets_by_user_name(username,limit=3000):
+    if limit>3000:
+        limit=3000
     tweets = tweepy.Cursor(api.user_timeline, screen_name=username, tweet_mode='extended').items(limit)
     for tweet in tweets:
         tweet_model=models.Tweet_user(username=tweet.user.screen_name,user_id=tweet.user.id,date=tweet.created_at,text=tweet.full_text)
@@ -27,8 +28,9 @@ def get_tweets_by_user_name(username):
 def autofollow(username):
     api.create_friendship(username)
 
-def get_tweets_hashtag(hashtag):
-    limit=3000
+def get_tweets_hashtag(hashtag,limit=3000):
+    if limit>3000:
+        limit=3000
     tweets = tweepy.Cursor(api.search_tweets,q=hashtag, tweet_mode='extended').items(limit)
     for tweet in tweets:
         tweet_model=models.Tweet_hashtag(hashtag=hashtag,username=tweet.user.screen_name,user_id=tweet.user.id,date=tweet.created_at,text=tweet.full_text)
@@ -41,5 +43,11 @@ def create_tweet(tweet_text,image_path="-"):
         api.update_status_with_media(tweet_text,image_path)
 
 
-def retweet(id):
-    api.retweet(id)
+def retweet(tweet_id):
+    api.retweet(tweet_id)
+
+
+def create_quote_tweet(text,username,tweet_id):
+    tweet_to_quote_url=f"https://twitter.com/{username}/status/{tweet_id}"
+    api.update_status(text, attachment_url=tweet_to_quote_url)
+
